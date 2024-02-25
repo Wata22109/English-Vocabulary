@@ -103,7 +103,7 @@ class WordApp(Qw.QMainWindow):
     def show_answer(self):
         if self.current_quiz_index < len(self.quiz_words):
             word, details = self.quiz_words[self.current_quiz_index]
-            self.quiz_answer_label.setText(f"意味: {details.get('意味', '')}\nExample: {details.get('例文', '')}")
+            self.quiz_answer_label.setText(f"意味: {details.get('意味', '')}\n例文: {details.get('例文', '')}")
             self.layout.addWidget(self.quiz_answer_label)
         else:
             Qw.QMessageBox.warning(self, "Error", "これ以上表示するものはありません。")
@@ -190,10 +190,10 @@ class DeleteWordDialog(Qw.QDialog):
 
         self.word_combobox = Qw.QComboBox()
         self.word_combobox.addItems(self.word_list)
-        self.layout.addWidget(Qw.QLabel("Select Word:"))
+        self.layout.addWidget(Qw.QLabel("削除する単語を選んでください。"))
         self.layout.addWidget(self.word_combobox)
 
-        self.delete_button = Qw.QPushButton("Delete")
+        self.delete_button = Qw.QPushButton("削除")
         self.delete_button.clicked.connect(self.delete_word)
         self.layout.addWidget(self.delete_button)
 
