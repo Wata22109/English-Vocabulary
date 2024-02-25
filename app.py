@@ -9,10 +9,11 @@ class WordApp(Qw.QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.words = {}
+        self.words = {} #単語のリスト
 
-        self.load_data()
+        self.load_data() #データのロード
 
+#画面の大きさ
         self.setWindowTitle("English Vocabulary App")
         rect = Qc.QRect()
         rect.setSize(Qc.QSize(640,480))
@@ -35,25 +36,29 @@ class WordApp(Qw.QMainWindow):
         button_widget = Qw.QWidget()
         button_layout = Qw.QHBoxLayout(button_widget)
 
+#単語追加ボタン
         self.add_word_button = Qw.QPushButton("単語の追加")
         self.add_word_button.clicked.connect(self.add_word_dialog)
         button_layout.addWidget(self.add_word_button)
 
+#勉強ボタン
         self.study_button = Qw.QPushButton("勉強")
         self.study_button.clicked.connect(self.study_words)
         button_layout.addWidget(self.study_button)
 
+#ランダム出題ボタン
         self.random_quiz_button = Qw.QPushButton("ランダム出題")
         self.random_quiz_button.clicked.connect(self.random_quiz)  
         button_layout.addWidget(self.random_quiz_button)
 
+#単語削除ボタン
         self.delete_word_button = Qw.QPushButton("単語の削除")
         self.delete_word_button.clicked.connect(self.delete_word_dialog)
         button_layout.addWidget(self.delete_word_button)
 
         self.layout.addWidget(button_widget)
 
-        self.display_saved_words()
+        self.display_saved_words()#保存されていた単語を表示
 
         self.quiz_word_label = Qw.QLabel()
         self.quiz_answer_label = Qw.QLabel()
@@ -62,6 +67,7 @@ class WordApp(Qw.QMainWindow):
         self.show_answer_button = Qw.QPushButton("答え")
         self.show_answer_button.clicked.connect(self.show_answer)
 
+#単語追加の処理
     def add_word_dialog(self):
         dialog = AddWordDialog()
         if dialog.exec_():
@@ -71,7 +77,7 @@ class WordApp(Qw.QMainWindow):
             self.words[word] = {"意味": meaning, "例文": example}
             self.save_data()
             self.display_word(word, meaning, example)
-
+#答えを非表示
     def study_words(self):
         for i in reversed(range(self.words_layout.count())):
             self.words_layout.itemAt(i).widget().setParent(None)
@@ -79,7 +85,7 @@ class WordApp(Qw.QMainWindow):
         for word, details in self.words.items():
             word_widget = WordWidget(word, details.get("意味", ""), details.get("例文", ""))
             self.words_layout.addWidget(word_widget)
-
+#ランダム出題の処理
     def random_quiz(self):
         if not self.words:
             Qw.QMessageBox.warning(self, "Error", "単語が存在しません。")
@@ -88,7 +94,7 @@ class WordApp(Qw.QMainWindow):
         self.quiz_words = random.sample(list(self.words.items()), len(self.words))
         self.current_quiz_index = 0
         self.show_quiz()
-
+#出題
     def show_quiz(self):
         if self.current_quiz_index < len(self.quiz_words):
             word, details = self.quiz_words[self.current_quiz_index]
@@ -99,19 +105,19 @@ class WordApp(Qw.QMainWindow):
             self.layout.addWidget(self.next_question_button)
         else:
             Qw.QMessageBox.information(self, "終了", "全ての単語が出題されました。")
-
+#答えの表示
     def show_answer(self):
         if self.current_quiz_index < len(self.quiz_words):
             word, details = self.quiz_words[self.current_quiz_index]
             self.quiz_answer_label.setText(f"意味: {details.get('意味', '')}\n例文: {details.get('例文', '')}")
             self.layout.addWidget(self.quiz_answer_label)
         else:
-            Qw.QMessageBox.warning(self, "Error", "これ以上表示するものはありません。")
-
+            Qw.QMessageBox.warning(self, "Error", "全ての単語が出題されました。")
+#次の問題
     def next_question(self):
         self.current_quiz_index += 1
         self.show_quiz()
-
+#単語削除の処理
     def delete_word_dialog(self):
         dialog = DeleteWordDialog(self.words.keys())
         if dialog.exec_():
@@ -123,16 +129,16 @@ class WordApp(Qw.QMainWindow):
                 Qw.QMessageBox.information(self, "Success", "単語が削除されました。")
             else:
                 Qw.QMessageBox.warning(self, "Error", "選択した単語は存在しません。")
-
+#データの保存処理
     def save_data(self):
         with open("data.pkl", "wb") as f:
             pickle.dump(self.words, f)
-
+#データのロード
     def load_data(self):
         if os.path.exists("data.pkl"):
             with open("data.pkl", "rb") as f:
                 self.words = pickle.load(f)
-
+#保存した単語の表示
     def display_saved_words(self):
         for i in reversed(range(self.words_layout.count())):
             self.words_layout.itemAt(i).widget().setParent(None)
@@ -144,6 +150,7 @@ class WordApp(Qw.QMainWindow):
         word_widget = WordWidget(word, meaning, example)
         self.words_layout.addWidget(word_widget)
 
+#単語の追加ボタンについて
 class AddWordDialog(Qw.QDialog):
     def __init__(self):
         super().__init__()
@@ -176,6 +183,7 @@ class AddWordDialog(Qw.QDialog):
         else:
             super().accept()
 
+#単語削除ボタンについて
 class DeleteWordDialog(Qw.QDialog):
     def __init__(self, word_list):
         super().__init__()
@@ -226,7 +234,7 @@ class WordWidget(Qw.QWidget):
         self.layout.addWidget(self.answer_label)
 
         self.displayed = False
-
+#答えの表示
     def show_answer(self):
         if self.displayed:
             self.answer_label.hide()            
